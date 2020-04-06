@@ -24,7 +24,7 @@ test('fires onChange', async () => {
     return new Promise((resolve) => {
       requestAnimationFrame(() => {
         fireEvent.change(select, {
-          target: { value: 'false' },
+          currentTarget: { value: 'false' },
         });
         resolve();
       });
