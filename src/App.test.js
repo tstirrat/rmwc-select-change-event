@@ -2,20 +2,35 @@ import React from 'react';
 import { render, act, fireEvent } from '@testing-library/react';
 import { Select } from '@rmwc/select';
 
-test('renders learn react link', () => {
+test('fires onChange', async () => {
   const onChange = jest.fn();
   const { getByText } = render(
-    <Select onChange={onChange} label="My select" options={['true', 'false']} />
+    <Select
+      onChange={(e) => {
+        console.log('onChange', e);
+        onChange(e.currentTarget.value);
+      }}
+      label="My select"
+      value={'true'}
+      options={['true', 'false']}
+    />
   );
 
-  act(() => {
-    const label = getByText('My select');
-    const wrapper = label.closest('.mdc-select');
-    const select = wrapper.querySelector('select');
-    fireEvent.change(select, {
-      target: { value: 'false' }
+  const label = getByText('My select');
+  const wrapper = label.closest('.mdc-select');
+  const select = wrapper.querySelector('select');
+
+  await act(() => {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        fireEvent.change(select, {
+          target: { value: 'false' },
+        });
+        resolve();
+      });
     });
   });
 
-  expect(onChange).toHaveBeenCalled();
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange).toHaveBeenCalledWith('false');
 });
