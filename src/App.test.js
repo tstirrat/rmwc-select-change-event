@@ -2,6 +2,18 @@ import React from 'react';
 import { render, act, fireEvent } from '@testing-library/react';
 import { Select } from '@rmwc/select';
 
+export function actOnNextFrame(callback) {
+  return act(
+    async () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          callback();
+          resolve();
+        });
+      })
+  );
+}
+
 test('fires onChange', async () => {
   const onChange = jest.fn();
   const { getByText } = render(
@@ -20,14 +32,10 @@ test('fires onChange', async () => {
   const wrapper = label.closest('.mdc-select');
   const select = wrapper.querySelector('select');
 
-  await act(() => {
-    return new Promise((resolve) => {
-      requestAnimationFrame(() => {
-        fireEvent.change(select, {
-          currentTarget: { value: 'false' },
-        });
-        resolve();
-      });
+  await actOnNextFrame(() => {
+    fireEvent.change(select, {
+      currentTarget: { selectedIndex: 1, value: 'false' },
+      target: { selectedIndex: 1, value: 'false' },
     });
   });
 
